@@ -1,0 +1,45 @@
+spring:
+  application:
+    name: docker-test
+  profiles:
+    active: dev
+
+log:
+  dir: ./log
+
+mybatis-plus:
+  mapper-locations: classpath:mapper/*/*.xml
+
+########################################################
+#          不同环境         Environment for Localhost  注意：数据配置在这里
+########################################################
+---
+server:
+  port: 8001
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 10200MB
+      max-request-size: 102400MB
+  profiles: dev
+  datasource:
+    #爆红不要紧张，没有问题的只是编辑工具不能识别造成的，本身是正确的,驱动可以不必写，url中可以体现，代码会自动判断的
+    #    driver-class-name: com.mysql.cj.jdbc.Driver   #8.X mysql
+    #    driver-class-name:  com.mysql.jdbc.Driver   #5.X mysql
+    url: jdbc:mysql://127.0.0.1:3306/recycle?useUnicode=true&characterEncoding=UTF-8&useAffectedRows=true&useSSL=false&serverTimezone=GMT%2B8
+    username: root
+    password: admin
+    hikari:
+      max-lifetime: 1765000
+      maximum-pool-size: 15
+#  redis:
+#    host: 127.0.0.1
+#    port: 6379
+#    password:
+#    database: 1
+
+
+---
+spring:
+  profiles: test
