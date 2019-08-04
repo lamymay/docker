@@ -3,3 +3,10 @@ VOLUME /data/docker
 ADD docker-0.0.1-SNAPSHOT.jar app1.jar
 ENTRYPOINT ["java", "-jar", "app1.jar"]
 
+FROM centos7_jdk8:8
+VOLUME /data/docker
+ADD docker-0.0.1-SNAPSHOT.jar app1.jar
+ENTRYPOINT ["java", "-jar", "app1.jar"]
+
+
+

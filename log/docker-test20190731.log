@@ -2,3 +2,7 @@
 14:51:09.736 [main] DEBUG com.arc.docker.DockerApplication Running with Spring Boot v2.1.6.RELEASE, Spring v5.1.8.RELEASE
 14:51:09.736 [main] INFO  com.arc.docker.DockerApplication The following profiles are active: dev
 14:51:13.830 [main] INFO  com.arc.docker.DockerApplication Started DockerApplication in 5.994 seconds (JVM running for 11.684)
+23:46:30.874 [main] INFO  com.arc.docker.DockerApplication Starting DockerApplication on DESKTOP-SOI6JK0 with PID 16980 (T:\Project\Za\docker\target\classes started by Z in T:\Project\Za\docker)
+23:46:30.876 [main] DEBUG com.arc.docker.DockerApplication Running with Spring Boot v2.1.6.RELEASE, Spring v5.1.8.RELEASE
+23:46:30.876 [main] INFO  com.arc.docker.DockerApplication The following profiles are active: dev
+23:46:33.656 [main] INFO  com.arc.docker.DockerApplication Started DockerApplication in 4.038 seconds (JVM running for 11.791)
