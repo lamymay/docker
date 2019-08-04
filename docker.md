@@ -1,11 +1,17 @@
 # docker 入门以及常用命令
 
 安装:
-在WIN系统上：有 docker  for windows installer，安装完成需要电脑打开虚拟化，经过测试，这个始终会与VMware有冲突，于是我采用Vmware来安装一个Linux环境，在Linux下学习使用docker
+# 在WIN系统下载软件为了在WIN上运作docker
+用 docker  for windows installer，安装完成需要电脑打开虚拟化，经过测试，这个始终会与VMware有冲突，于是我采用Vmware来安装一个Linux环境，在Linux下学习使用docker
 [WIN系统的docker安装包下载，注意WIN平台上与VMware 有冲突二选一，](https://download.docker.com/win/stable/Docker%20for%20Windows%20Installer.exe)
 
 
-在linux系统上：
+# 在WIN系统下，尝试使用 Kitematic 可视化管理 Docker
+Kitematic 是什么
+Kitematic是一个 Docker GUI 工具，它可以更快速、更简单的运行Docker，现在已经支持 Mac 和 Windows。Kitematic 目前在 Github 上开源，而它也早在 2015 年就已经被 Docker 收购。Kitematic 完全自动化了 Docker 安装和设置过程，并提供了一个直观的图形用户接口（GUI）来运行 Docker。通过 GUI 你可以非常容易的创建、运行和管理你的容器，不需要使用命令行或者是在 Docker CLI 和 GUI之间来回切换；同时也可以方便的修改环境变量、查看日志以及配置数据卷等。
+
+
+#在linux系统上：
 1.搭建docker环境
 需要linux系统必须是centOS7以上
 
@@ -74,14 +80,6 @@ Dockerfile既是docker的配置文件，里面的内容做一个简单的介绍:
 vi jdkdockerfile
 
 （jdkdockerfile 中的内容：）
-#注释：
-#1.FROM:指明当前镜像继承的基镜像,编译当前镜像时候会自动下载基镜像
-#2.MAINTAINER:当前镜像的作者和邮箱,使用空格隔开
-#3.VOLUME:挂载目录
-#4.ADD:从当前工作目录复制文件到镜像目录中并重新命名
-#5.RUN:在当前镜像上执行Linux命令,这里我执行了2个run指令,第二个run指令是为了解决容器和宿主机时间不一致的问题
-#6.EXPOSE:监听的端口号
-#7.ENTRYPOINT:让容器像一个可执行程序一样运行
 
 FROM centos:7
 MAINTAINER lamymay lamymay@outlook.com
@@ -99,6 +97,18 @@ ADD docker-0.0.1-SNAPSHOT.jar /data
 1、这里使用的镜像是上面下载的centos镜像； 
 2、编译镜像所需要的文件情拷贝到当前目录（配置文件所在目录，压缩包不用解压，jdk的话强烈建议使用rpm的包，以免配置由错，构建出来的镜像中java环境是失败的）jdk拷贝到dockerfile同级目录，如果在其它目录拷贝的时候可能出现找不到目录错误； 
 3、另外使用ADD指令会直接对 jdk-8u181-linux-x64.tar.gz  进行解压缩，不用再单独的tar解压jdk了
+
+FROM                    指明当前镜像继承的基镜像,编译当前镜像时候会自动下载基镜像
+MAINTAINER      当前镜像的作者和邮箱,使用空格隔开
+ADD<src><dest>从当前工作目录复制文件到镜像目录中并重新命名，SRC可以是URL，也可以是压缩包，默认是当前目录
+COPY                    只复制文件，和ADD类似，但是不支持URL和解压缩
+CMD                     只能一个，容器启动后执行的命令
+EXPOSE                声明容器运行时对外提供服务的端口，监听的端口号
+WORKDIR           容器工作路径
+ENV                      环境变量
+RUN                     构建阶段执行的命令，在当前镜像上执行Linux命令,这里我执行了2个run指令,第二个run指令是为了解决容器和宿主机时间不一致的问题
+VOLUME              挂载目录
+ENTRYPOINT      让容器像一个可执行程序一样运行
 
 
 
@@ -164,13 +174,62 @@ docker run -p 8001:8080  -d  <imgaeName>
 docker run -p 8001:8080  -d app1:0.0.1
 docker run -p 9000:8001 -di  app1:0.0.1
 docker run  centos7jdk8:8 /bin/bash -it
+docker run --name myNginx --rm -p 80:80 nginx
 
--p 指定端口号 第一个端口号8001为容器内部的端口号，第二个8080为外界访问的端口号，将容器内的8001端口号映射到外部的8080端口号
+-p 端口映射，指定端口号 第一个端口号8001为容器内部的端口号，第二个8080为外界访问的端口号，将容器内的8001端口号映射到外部的8080端口号
 如果想用域名来访问的话，需要把数据库连接改为服务器的ip+数据库端口号，并且命令改为：docker run -d -p 80:80 mystory
 
--d表示在后台运行
+--rm 临时容器
+--name 指定名称
+--ip 指定容器ip
+-h  设置hostname
+-u  指定运行用户
+-e  设置环境变量
+-d  表示在后台运行
+-v  设置挂在目录（通过分割两边文件，两百年都要写绝对路径）
+
+
+
+#查看日志
+ docker logs myNginx
+
+
+显示所有容器IP地址：
+docker inspect --format='{{.Name}} - {{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker ps -aq)
+
+常用方法有两种
+docker inspect 容器ID | grep IPAddress
+
+进入docker
+docker exec -it myNginx bash
+
+/etc/nginx
+
+
+docker ps -a
+docker stop
+
+
+docker history nginx
+
+overlay2 实际存储位置
+
+/var/liv/docker/overlay2/镜像ID
+diff    镜像改动的文件目录
+merged 挂载合并文件
+work 工作目录
+
+容器中的文件操作的实质： 
+
+文件增加    在diff目录中新增
+文件修改    在镜像中拷贝至diff目录，然后在修改
+文件删除   添加一个表示至diff目录
+
+Kubernetes 是一个开源的，用于管理云平台中多个主机上的容器化的应用
 
 ```
+
+------------------------
 
 ```$text
 
@@ -179,13 +238,6 @@ curl -X GET http://127.0.0.1:9000/info
 curl -X GET \
   http://127.0.0.1:8001/info \
   -H 'cache-control: no-cache'
-
-
-显示所有容器IP地址：
-docker inspect --format='{{.Name}} - {{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker ps -aq)
-
-常用方法有两种
-docker inspect 容器ID | grep IPAddress
 
 
 
@@ -201,9 +253,6 @@ VOLUME ：VOLUME 指向了一个/tmp的目录，由于 Spring Boot 使用内置�
 ADD ：拷贝文件并且重命名(前面是上传jar包的名字，后面是重命名)
 RUN ：每条run指令在当前基础镜像执行，并且提交新镜像
 ENTRYPOINT ：为了缩短 Tomcat 的启动时间，添加java.security.egd的系统属性指向/dev/urandom作为 ENTRYPOINT
-
-
-
 
 
 
@@ -233,11 +282,6 @@ https://www.clxz.top/2019/03/31/111040/
 -----------
 
 
-# 下载软件为了在WIN上运作docker
-https://download.docker.com/win/stable/Docker%20for%20Windows%20Installer.exe
-#尝试使用 Kitematic 可视化管理 Docker
-Kitematic 是什么
-Kitematic是一个 Docker GUI 工具，它可以更快速、更简单的运行Docker，现在已经支持 Mac 和 Windows。Kitematic 目前在 Github 上开源，而它也早在 2015 年就已经被 Docker 收购。Kitematic 完全自动化了 Docker 安装和设置过程，并提供了一个直观的图形用户接口（GUI）来运行 Docker。通过 GUI 你可以非常容易的创建、运行和管理你的容器，不需要使用命令行或者是在 Docker CLI 和 GUI之间来回切换；同时也可以方便的修改环境变量、查看日志以及配置数据卷等。
 
 state 和 status 的区别：
 
